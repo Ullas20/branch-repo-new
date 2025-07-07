@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+
+    environment {
+        APP_NAME = "my-app"
+    }
+
+    stages {
+        stage('Code Checkout') {
+            steps {
+                checkout scm
+                echo "Branch: ${env.BRANCH_NAME}"
+            }
+        }
+
+        stage('Static Code Analysis') {
+            steps {
+                echo "Running SonarQube Scan"
+                // Add your sonar command here
+            }
+        }
+
+        stage('Unit Tests') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'dev'
+                }
+            }
+            steps {
+                echo "Running Unit Tests"
+                // e.g., sh 'mvn test'
+            }
+        }
+
+        stage('Build') {
+            when {
+                branch 'main'
+            }
+            steps {
+                echo "Building the application"
+                // e.g., sh 'mvn clean package'
+            }
+        }
+
+        stage('Deploy') {
+            when {
+                branch 'main'
+            }
+            steps {
+                echo "Deploying to production"
+                // e.g., Deploy to server or cloud
+            }
+        }
+    }
+
+    post {
+        always {
+            echo "Pipeline finished for branch: ${env.BRANCH_NAME}"
+        }
+    }
+}
